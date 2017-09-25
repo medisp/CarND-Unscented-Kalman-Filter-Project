@@ -8,8 +8,8 @@ public:
   long timestamp_;
 
   enum SensorType{
-    LASER,
-    RADAR
+    Laser,
+    Radar
   } sensor_type_;
 
   Eigen::VectorXd raw_measurements_;

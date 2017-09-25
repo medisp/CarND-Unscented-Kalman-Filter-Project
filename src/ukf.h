@@ -60,12 +60,25 @@ public:
 
   ///* State dimension
   int n_x_;
+  ///* number of sigma points
+  int n_sig_;
 
   ///* Augmented state dimension
   int n_aug_;
 
   ///* Sigma point spreading parameter
   double lambda_;
+
+  ///* INIT for NIS Radar
+  double NIS_radar_;
+  ///* INIT for NIS Laser
+  double NIS_laser_;
+
+  ///* Covariance matrix for radar
+  MatrixXd R_radar_; 
+  ///* covariance matrix for laser
+  MatrixXd R_laser_;	
+	
 
 
   /**
@@ -102,6 +115,20 @@ public:
    * @param meas_package The measurement at k+1
    */
   void UpdateRadar(MeasurementPackage meas_package);
+ 
+ /**
+  * Normalizes the angles from -Pi to Pi 	
+  *
+  */	
+void Angle(double *angle);
+ 
+/**
+  * Updates Unscented Kalman Filter in common step for radar/laser	
+  *
+  */
+void UpdateUKF(MeasurementPackage meas_package, MatrixXd Zsig, int n_dim);
+
+
 };
 
 #endif /* UKF_H */
