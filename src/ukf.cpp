@@ -60,11 +60,11 @@ UKF::UKF() {
   // init state vector 
   x_ = VectorXd(5);
 
-  x_ << 3.5,
-        1.5,
-        1.3,
-        0.3,
-        0.2;
+  x_ << 0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0;
 
   // init covariance matrix P_
   P_ = MatrixXd(n_x_,n_x_); 
@@ -123,11 +123,11 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   */
  if (!is_initialized_) {
     // covariance matrix independent of sensor:
-      P_ << 0.0043, -0.0013,  0.0030, -0.0022, -0.0020,
-       -0.0013,  0.0077,  0.0011,  0.0071, -0.0060,
-        0.0030,  0.0011,  0.0054,  0.0007,  0.0008,
-       -0.0022,  0.0071,  0.0007,  0.0098,  0.0100,
-       -0.0020,  0.0060,  0.0008,  0.0100,  0.0123;
+      P_ << 1,0,0,0,0,
+	    0,1,0,0,0,
+	    0,0,1,0,0,
+	    0,0,0,1,0,
+	    0,0,0,0,1;
    
     if (meas_package.sensor_type_ == MeasurementPackage::Radar) {
         
