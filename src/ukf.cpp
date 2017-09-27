@@ -24,10 +24,10 @@ UKF::UKF() {
   P_ = MatrixXd(5, 5);
 
   // Process noise standard deviation longitudinal acceleration in m/s^2
-  std_a_ = .5;
+  std_a_ = 1.5;
 
   // Process noise standard deviation yaw acceleration in rad/s^2
-  std_yawdd_ = .1;
+  std_yawdd_ = M_PI/4;
 
   // Laser measurement noise standard deviation position1 in m
   std_laspx_ = 0.15;
@@ -123,11 +123,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   */
  if (!is_initialized_) {
     // covariance matrix independent of sensor:
-      P_ << 1,0,0,0,0,
-	    0,1,0,0,0,
-	    0,0,1,0,0,
-	    0,0,0,1,0,
-	    0,0,0,0,1;
+      P_ = MatrixXd::Identity(5,5);
    
     if (meas_package.sensor_type_ == MeasurementPackage::Radar) {
         
@@ -138,7 +134,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 	// polar to cartesian coordinate conversion
         double px = rho * cos(phi);
 	double py = rho * sin(phi);
-	double v = sqrt((rhodot*cos(phi)*rhodot*cos(phi))+(rhodot*sin(phi)*rhodot*sin(phi)));
+	double v = sqrt((rhodot*rhodot)*(sin(phi)*sin(phi)+cos(phi)*cos(phi)));
  	x_ <<  px, py, v, 0, 0;
         }
     else if (meas_package.sensor_type_ == MeasurementPackage::Laser) {
@@ -229,29 +225,29 @@ void UKF::Prediction(double delta_t) {
 	for (int i=0;i<n_sig_;i++)
 	{
 
-	double px = Xsig_aug(0,i);
-	double py = Xsig_aug(1,i);
-	double v = Xsig_aug(2,i);
-	double psi = Xsig_aug(3,i);
-	double psidot = Xsig_aug(4,i);
-	double mu_a = Xsig_aug(5,i);
-	double mu_psi = Xsig_aug(6,i);
+	const double px = Xsig_aug(0,i);
+	const double py = Xsig_aug(1,i);
+	const double v = Xsig_aug(2,i);
+	const double psi = Xsig_aug(3,i);
+	const double psidot = Xsig_aug(4,i);
+	const double mu_a = Xsig_aug(5,i);
+	const double mu_psi = Xsig_aug(6,i);
 	
-	double px_p, py_p;
+	const double px_p, py_p;
 	if (fabs(psidot) > 0.001) {
-		double v_psidot = v/psidot;
+		const double v_psidot = v/psidot;
 		px_p = px + v_psidot*(sin(psi+psidot*delta_t)-sin(psi));
 		py_p = py + v_psidot*(cos(psi) - cos(psi+psidot*delta_t));
 		}
 
 	else {
-		double v_dt = v*delta_t;	
+		const double v_dt = v*delta_t;	
 		px_p = px + v_dt*cos(psi);
 		py_p = py + v_dt*sin(psi);		
 		}
-	double v_p = v;
-	double psi_p = psi+psidot*delta_t;
-	double psidot_p = psidot;
+	const double v_p = v;
+	const double psi_p = psi+psidot*delta_t;
+	const ouble psidot_p = psidot;
 	// noise calculation
 	px_p += 0.5*mu_a*delta_tsq*cos(psi);
 	py_p += 0.5*mu_a*delta_tsq*sin(psi);
@@ -267,7 +263,7 @@ void UKF::Prediction(double delta_t) {
 		
 	} // end of for loop
 	// predict mean and covariance
-	x_ = Xsig_pred_ + weights_;
+	x_ = Xsig_pred_ * weights_;
 	P_.fill(0.0);
 	for (int i=0;i<n_sig_;i++) {
 		// calculating diff between pred and measurement		
@@ -317,10 +313,10 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
 	MatrixXd Zsig = MatrixXd(n_dim,n_sig_);
 	//convert and calculate sigma pt values for Radar
 	for (int i =0; i<n_sig_;i++) {
-	double px = Xsig_pred_(0,i);
-	double py = Xsig_pred_(1,i);
-	double v = Xsig_pred_(2,i);
-	double psi = Xsig_pred_(3,i);
+	const double px = Xsig_pred_(0,i);
+	const double py = Xsig_pred_(1,i);
+	const double v = Xsig_pred_(2,i);
+	const double psi = Xsig_pred_(3,i);
 	//Filling measurements for rho phi and rhodot
 	Zsig(0,i) = sqrt(px*px+py*py);
 	Zsig(1,i) = atan2(py,px);
