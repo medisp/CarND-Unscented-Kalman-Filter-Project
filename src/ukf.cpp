@@ -233,21 +233,21 @@ void UKF::Prediction(double delta_t) {
 	const double mu_a = Xsig_aug(5,i);
 	const double mu_psi = Xsig_aug(6,i);
 	
-	const double px_p, py_p;
+	double px_p, py_p;
 	if (fabs(psidot) > 0.001) {
-		const double v_psidot = v/psidot;
+		double v_psidot = v/psidot;
 		px_p = px + v_psidot*(sin(psi+psidot*delta_t)-sin(psi));
 		py_p = py + v_psidot*(cos(psi) - cos(psi+psidot*delta_t));
 		}
 
 	else {
-		const double v_dt = v*delta_t;	
+		double v_dt = v*delta_t;	
 		px_p = px + v_dt*cos(psi);
 		py_p = py + v_dt*sin(psi);		
 		}
-	const double v_p = v;
-	const double psi_p = psi+psidot*delta_t;
-	const ouble psidot_p = psidot;
+	double v_p = v;
+	double psi_p = psi+psidot*delta_t;
+	double psidot_p = psidot;
 	// noise calculation
 	px_p += 0.5*mu_a*delta_tsq*cos(psi);
 	py_p += 0.5*mu_a*delta_tsq*sin(psi);
